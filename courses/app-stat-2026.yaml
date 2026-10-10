@@ -1,0 +1,56 @@
+---
+# Configuration file for lab-grader
+
+course:
+    name: Прикладная статистика
+    alt-names: 
+        - AS
+        - ПрикСтат
+    semester: Осень 2026
+    university: ИТМО
+    email: kiselev@itmo.ru
+    timezone: UTC+3
+    github:
+        organization: itmo-as-2026
+        teachers:
+            - "Konstantin Kiselev"
+            - cosmos-way
+    google:
+        spreadsheet: 
+        info-sheet: График
+        task-id-column: 0
+        student-name-column: 1
+        lab-column-offset: 1
+    staff:
+        - name: Kkiselev
+          title: ст. преп.
+          status: лабораторные работы
+    labs:
+        "0":
+            github-prefix: fs-lab0
+            short-name: ДЗ0
+            penalty-max: 5
+            ignore-task-id: True
+            # score:
+            #   patterns:
+            #     - '##\[notice\]Points\s+(\d+(?:[.,]\d+)?)/\d+'  # "##[notice]Points 10/10" -> 10
+            #     - 'Score\s+is\s+(\d+(?:[.,]\d+)?)'              # "Score is 10.5" -> 10.5
+            #     - 'Total:\s+(\d+(?:[.,]\d+)?)'                  # "Total: 10" -> 10
+            ci:
+                - workflows
+            files:
+                - goals.md
+                - info.md
+                - report.pdf
+            moss:
+                language: c
+            report:
+                - Задание
+                - Результат
+            validation:
+                commits:
+                    -
+                        filter: console
+                        min-count: 1
+misc:
+    requests-timeout: 5
