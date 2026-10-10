@@ -1,25 +1,32 @@
-# Example docker-compose.yaml for production deployment
-#
-# This file is NOT used in development. It's a template for server deployment.
-# Copy this to your server at /opt/labgrader/docker-compose.yaml
-#
-# IMPORTANT: Do NOT commit your actual docker-compose.yaml to git!
-#            It contains secrets and should only exist on the server.
+
 
 services:
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./certs:/etc/caddy/certs:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - caddy-proxy
   frontend:
-    image: ghcr.io/markpolyak/lab_grader_frontend:main
+    image: ghcr.io/cosmos-way/lab_grader_frontend:main
     restart: unless-stopped
     networks:
       - caddy-proxy
     labels:
-      caddy: labgrader.markpolyak.ru
+      caddy: itmo-labs.cosmosway.ru
       caddy.reverse_proxy: "{{upstreams 8080}}"
       # Watchtower labels (optional)
       com.centurylinklabs.watchtower.enable: "true"
 
   backend:
-    image: ghcr.io/markpolyak/lab_grader_backend:main
+    image: ghcr.io/cosmos-way/lab_grader_backend:main
     restart: unless-stopped
     volumes:
       - ./google-credentials:/app/google-credentials/
@@ -36,7 +43,7 @@ services:
       LOG_DIR: /app/logs  # Directory for persistent log files
       LOG_LEVEL: INFO  # Options: DEBUG, INFO, WARNING, ERROR (use DEBUG for detailed troubleshooting)
     labels:
-      caddy: labgrader.markpolyak.ru
+      caddy: itmo-labs.cosmosway.ru
       # API endpoints
       caddy.handle_path: /api/v1*
       caddy.handle_path.0_reverse_proxy: "{{upstreams 8000}}"
@@ -48,20 +55,16 @@ services:
     networks:
       - caddy-proxy
 
+
+
+volumes:
+  caddy_data:
+  caddy_config:
+
 networks:
   caddy-proxy:
     external: true
+    name: caddy-proxy
 
-# Alternative configuration using environment variable for branch:
-#
-# services:
-#   frontend:
-#     image: ghcr.io/markpolyak/lab_grader_frontend:${BRANCH:-main}
-#   backend:
-#     image: ghcr.io/markpolyak/lab_grader_backend:${BRANCH:-main}
-#
-# Then you can switch branches with:
-#   BRANCH=feature-xyz docker compose up -d --pull=always --force-recreate
-#
-# Or create a .env file with:
-#   BRANCH=feature-xyz
+
+
